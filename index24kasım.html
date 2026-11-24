@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Canım Ayfer Hocam — Öğretmenler Gününüz Kutlu Olsun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-cream: #f6f1e7;
+      --paper-ivory: #fffdf8;
+      --paper-border: #e5dccb;
+      --envelope-body: #ebd9c0;
+      --envelope-flap: #e2ccb0;
+      --envelope-shadow: rgba(65, 45, 25, 0.14);
+      --wax-red: #8b262d;
+      --wax-red-dark: #63181e;
+      --gold-accent: #c5a059;
+      --ink-dark: #2c241d;
+      --ink-muted: #6e5f52;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-cream);
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(197, 160, 89, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(139, 38, 45, 0.06) 0%, transparent 50%);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      color: var(--ink-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: calc(env(safe-area-inset-top, 16px) + 52px);
+      padding-bottom: 64px;
+      padding-left: 16px;
+      padding-right: 16px;
+      overflow-x: hidden;
+    }
+
+    /* Üst Kontrol Barı */
+    .top-bar {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 12px) + 10px);
+      right: 16px;
+      z-index: 50;
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .top-bar.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .pill-btn {
+      background: rgba(255, 253, 248, 0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--paper-border);
+      color: var(--ink-muted);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(44, 36, 29, 0.08);
+      transition: all 0.25s ease;
+    }
+
+    .pill-btn:hover {
+      color: var(--ink-dark);
+      border-color: var(--gold-accent);
+      transform: translateY(-1px);
+    }
+
+    /* Zarf Sahnesi */
+    .stage {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: auto;
+      margin-bottom: auto;
+      transition: margin 0.6s ease;
+    }
+
+    .stage.opened {
+      margin-top: 12px;
+      margin-bottom: 0;
+    }
+
+    .envelope-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      height: 250px;
+      perspective: 1200px;
+      cursor: pointer;
+      transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .stage.opened .envelope-wrapper {
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.92) translateY(24px);
+      margin-bottom: 0;
+    }
+
+    .envelope {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, #efe0ca 0%, var(--envelope-body) 100%);
+      border-radius: 12px;
+      box-shadow:
+        0 20px 45px var(--envelope-shadow),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+      overflow: hidden;
+    }
+
+    /* Zarf İç Katmanları */
+    .envelope-pocket {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .envelope-pocket::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, #e3cfb2 0%, #ead9c0 100%);
+      clip-path: polygon(0 100%, 50% 48%, 100% 100%);
+      border-top: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .envelope-pocket::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(226, 204, 176, 0.65) 0%, transparent 25%, transparent 75%, rgba(226, 204, 176, 0.65) 100%);
+      clip-path: polygon(0 0, 50% 52%, 0 100%, 100% 100%, 50% 52%, 100% 0);
+    }
+
+    /* Üst Kapak */
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 62%;
+      background: linear-gradient(180deg, #dfC7a8 0%, var(--envelope-flap) 100%);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 4;
+      box-shadow: 0 6px 14px rgba(65, 45, 25, 0.12);
+    }
+
+    .envelope-wrapper.opening .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+
+    /* Balmumu Mühür */
+    .wax-seal {
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #a8323a 0%, var(--wax-red) 60%, var(--wax-red-dark) 100%);
+      box-shadow:
+        0 8px 18px rgba(99, 24, 30, 0.38),
+        inset 0 2px 4px rgba(255, 255, 255, 0.25),
+        inset 0 -3px 6px rgba(45, 8, 12, 0.45);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    .wax-seal::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(235, 200, 145, 0.55);
+    }
+
+    .wax-seal span {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 30px;
+      font-weight: 600;
+      font-style: italic;
+      color: #f4dfc0;
+      text-shadow: 0 1px 2px rgba(45, 8, 12, 0.6);
+      user-select: none;
+    }
+
+    .envelope-wrapper:hover .wax-seal {
+      transform: translate(-50%, -50%) scale(1.06);
+    }
+
+    .envelope-wrapper.opening .wax-seal {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.75);
+    }
+
+    .hint-text {
+      margin-top: 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      text-align: center;
+      transition: opacity 0.4s ease;
+    }
+
+    .stage.opened .hint-text {
+      opacity: 0;
+      height: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Mektup Kâğıdı */
+    .letter-card {
+      width: 100%;
+      background-color: var(--paper-ivory);
+      background-image:
+        linear-gradient(rgba(197, 160, 89, 0.06) 1px, transparent 1px),
+        radial-gradient(circle at top right, rgba(197, 160, 89, 0.07), transparent 40%);
+      background-size: 100% 34px, 100% 100%;
+      border: 1px solid var(--paper-border);
+      border-radius: 14px;
+      padding: 40px 28px 48px;
+      box-shadow:
+        0 18px 45px rgba(55, 40, 25, 0.09),
+        0 2px 6px rgba(55, 40, 25, 0.04);
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transform: translateY(24px);
+      transition:
+        opacity 0.8s ease 0.25s,
+        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.25s,
+        max-height 0.1s linear;
+    }
+
+    .stage.opened .letter-card {
+      opacity: 1;
+      max-height: 4000px;
+      transform: translateY(0);
+    }
+
+    .letter-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-accent);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .letter-salutation {
+      font-size: 29px;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--wax-red);
+      margin-bottom: 24px;
+      line-height: 1.25;
+    }
+
+    .letter-body p {
+      font-size: 19.5px;
+      line-height: 1.78;
+      color: var(--ink-dark);
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .letter-closing {
+      margin-top: 28px;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--ink-dark);
+      line-height: 1.6;
+    }
+
+    .letter-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--paper-border), transparent);
+      margin: 28px 0 20px;
+    }
+
+    .letter-signature {
+      text-align: right;
+      font-size: 22px;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--wax-red-dark);
+    }
+
+    /* Aşağı Kaydırınca Açılan Botanik Çiçek */
+    .flower-section {
+      margin-top: 44px;
+      padding-top: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .botanical-flower {
+      width: 130px;
+      height: 150px;
+      overflow: visible;
+    }
+
+    .stem {
+      stroke-dasharray: 120;
+      stroke-dashoffset: 120;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .leaf {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: bottom center;
+      transform: scale(0.3);
+      transition: opacity 0.9s ease 0.45s, transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
+    }
+
+    .petal {
+      transform-box: fill-box;
+      transform-origin: 50% 92%;
+      transition: transform 1.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
+    }
+
+    .petal-outer-left {
+      transform: rotate(18deg) scale(0.76);
+      opacity: 0.78;
+    }
+
+    .petal-outer-right {
+      transform: rotate(-18deg) scale(0.76);
+      opacity: 0.78;
+    }
+
+    .petal-mid-left {
+      transform: rotate(10deg) scale(0.84);
+      opacity: 0.88;
+    }
+
+    .petal-mid-right {
+      transform: rotate(-10deg) scale(0.84);
+      opacity: 0.88;
+    }
+
+    .petal-center {
+      transform: scale(0.88);
+    }
+
+    .flower-core {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      transform: scale(0.2);
+      transition: opacity 0.9s ease 0.75s, transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.75s;
+    }
+
+    /* Çiçek Açılmış Hali */
+    .flower-section.bloomed .stem {
+      stroke-dashoffset: 0;
+    }
+
+    .flower-section.bloomed .leaf {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .flower-section.bloomed .petal-outer-left {
+      transform: rotate(-34deg) scale(1);
+      opacity: 1;
+      transition-delay: 0.35s;
+    }
+
+    .flower-section.bloomed .petal-outer-right {
+      transform: rotate(34deg) scale(1);
+      opacity: 1;
+      transition-delay: 0.35s;
+    }
+
+    .flower-section.bloomed .petal-mid-left {
+      transform: rotate(-17deg) scale(1);
+      opacity: 1;
+      transition-delay: 0.5s;
+    }
+
+    .flower-section.bloomed .petal-mid-right {
+      transform: rotate(17deg) scale(1);
+      opacity: 1;
+      transition-delay: 0.5s;
+    }
+
+    .flower-section.bloomed .petal-center {
+      transform: scale(1.03);
+      transition-delay: 0.6s;
+    }
+
+    .flower-section.bloomed .flower-core {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .flower-caption {
+      margin-top: 8px;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--ink-muted);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.9s ease 0.95s, transform 0.9s ease 0.95s;
+    }
+
+    .flower-section.bloomed .flower-caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .footer-note {
+      margin-top: 32px;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--ink-muted);
+      opacity: 0.75;
+    }
+
+    @media (min-width: 600px) {
+      .letter-card {
+        padding: 52px 48px 56px;
+      }
+      .letter-salutation {
+        font-size: 33px;
+      }
+      .letter-body p {
+        font-size: 20.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar" id="topBar">
+    <button class="pill-btn" id="closeEnvelopeBtn" type="button">Zarfı Kapat</button>
+  </div>
+
+  <main class="stage" id="stage">
+    <div class="envelope-wrapper" id="envelopeWrapper" role="button" tabindex="0" aria-label="Zarfı açmak için dokunun">
+      <div class="envelope">
+        <div class="envelope-flap"></div>
+        <div class="envelope-pocket"></div>
+        <div class="wax-seal">
+          <span>A</span>
+        </div>
+      </div>
+    </div>
+    <p class="hint-text">Mühre dokunarak mektubu açın</p>
+
+    <article class="letter-card" id="letterCard">
+      <span class="letter-eyebrow">24 Kasım Öğretmenler Günü</span>
+      <h1 class="letter-salutation">Canım Ayfer Hocam,</h1>
+
+      <div class="letter-body">
+        <p>
+          Bugün geriye dönüp baktığımda, kendime dair gurur duyduğum ne varsa temelinde sizin sabrınızı, emeğinizi ve o hiç eksilmeyen şefkatinizi görüyorum. Lise yıllarımda bana sadece ders anlatmadınız; bana kendime inanmayı, zorluklar karşısında vazgeçmemeyi ve iyi bir insan olmanın değerini öğrettiniz.
+        </p>
+
+        <p>
+          Yıllar geçtikçe, hayatın koşturmacası içinde o lise koridorlarını, derslerinize yetişmeye çalıştığım o saf günleri ve bana her zaman güler yüzle açtığınız kapınızı öyle çok özlüyorum ki… İnsan büyüdükçe, bir öğretmenin hiç karşılık beklemeden verdiği o sessiz fedakârlığın ne kadar büyük bir mucize olduğunu çok daha derinden anlıyor.
+        </p>
+
+        <p>
+          Ne zaman bir yol ayrımında kalsam ya da yorulduğumu hissetsem, yıllar önce bana duyduğunuz o güven aklıma geliyor ve sesiniz hâlâ bana güç veriyor. Üzerimdeki hakkınızı hiçbir zaman ödeyemem; iyi ki yollarımız kesişmiş, iyi ki benim öğretmenim olmuşsunuz ve hayatıma dokunmuşsunuz.
+        </p>
+
+        <p>
+          Varlığınız, emeğiniz ve bana kattığınız her bir değer için size yürekten minnettarım. Sağlıklı, huzurlu ve mutluluk dolu nice güzel yıllarınız olsun.
+        </p>
+      </div>
+
+      <p class="letter-closing">
+        Öğretmenler Gününüz kutlu olsun hocam,<br />
+        saygıyla ellerinizden öperim.
+      </p>
+
+      <div class="letter-divider"></div>
+      <div class="letter-signature">Sizi hiç unutmayan öğrenciniz</div>
+
+      <!-- Sayfa aşağı kaydırılınca yapraklarını açan çiçek -->
+      <div class="flower-section" id="flowerSection">
+        <svg class="botanical-flower" viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Sap -->
+          <path class="stem" d="M70 148 C69 124, 71 102, 70 76" stroke="#6c8263" stroke-width="2.4" stroke-linecap="round" />
+
+          <!-- Yapraklar -->
+          <path class="leaf" d="M70 124 C54 121, 44 110, 46 98 C57 101, 66 111, 70 124 Z" fill="#829978" />
+          <path class="leaf" d="M70 112 C86 109, 96 98, 94 86 C83 89, 74 99, 70 112 Z" fill="#738a69" />
+
+          <!-- Çiçek Taç Yaprakları -->
+          <g class="petals">
+            <!-- Dış Sol Yaprak -->
+            <path class="petal petal-outer-left" d="M70 80 C48 70, 42 42, 58 26 C66 40, 69 60, 70 80 Z" fill="#d99b9b" />
+            <!-- Dış Sağ Yaprak -->
+            <path class="petal petal-outer-right" d="M70 80 C92 70, 98 42, 82 26 C74 40, 71 60, 70 80 Z" fill="#d99b9b" />
+            <!-- Orta Sol Yaprak -->
+            <path class="petal petal-mid-left" d="M70 80 C53 66, 51 38, 63 22 C69 38, 70 58, 70 80 Z" fill="#c7797e" />
+            <!-- Orta Sağ Yaprak -->
+            <path class="petal petal-mid-right" d="M70 80 C87 66, 89 38, 77 22 C71 38, 70 58, 70 80 Z" fill="#c7797e" />
+            <!-- Merkez Yaprak -->
+            <path class="petal petal-center" d="M70 80 C58 62, 59 34, 70 18 C81 34, 82 62, 70 80 Z" fill="#a84a52" />
+          </g>
+
+          <!-- Altın Çiçek Özü -->
+          <circle class="flower-core" cx="70" cy="63" r="4.5" fill="#e5c17b" />
+          <circle class="flower-core" cx="65" cy="59" r="2" fill="#f3dca8" />
+          <circle class="flower-core" cx="75" cy="59" r="2" fill="#f3dca8" />
+        </svg>
+        <span class="flower-caption">Sevgi ve minnetle…</span>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer-note">Saygı ve minnetle…</footer>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const envelopeWrapper = document.getElementById('envelopeWrapper');
+    const topBar = document.getElementById('topBar');
+    const closeEnvelopeBtn = document.getElementById('closeEnvelopeBtn');
+    const flowerSection = document.getElementById('flowerSection');
+
+    let isOpened = false;
+
+    function openEnvelope() {
+      if (isOpened) return;
+      isOpened = true;
+      envelopeWrapper.classList.add('opening');
+
+      setTimeout(() => {
+        stage.classList.add('opened');
+        topBar.classList.add('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 480);
+    }
+
+    function closeEnvelope() {
+      if (!isOpened) return;
+      isOpened = false;
+      stage.classList.remove('opened');
+      topBar.classList.remove('visible');
+      flowerSection.classList.remove('bloomed');
+
+      setTimeout(() => {
+        envelopeWrapper.classList.remove('opening');
+      }, 250);
+    }
+
+    envelopeWrapper.addEventListener('click', openEnvelope);
+    envelopeWrapper.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openEnvelope();
+      }
+    });
+
+    closeEnvelopeBtn.addEventListener('click', closeEnvelope);
+
+    // Sayfa aşağı kaydırılıp çiçeğe ulaşıldığında çiçeği aç
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && isOpened) {
+            flowerSection.classList.add('bloomed');
+          }
+        });
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(flowerSection);
+  </script>
+</body>
+</html>
